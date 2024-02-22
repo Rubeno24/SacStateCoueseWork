@@ -64,6 +64,10 @@ int main(int argc, char* argv[])
                 printf("The bounded buffer can not exceed 600");
                 exit(1);
         }
+        else if(bufSize<=2){
+                printf("The bounded buffer can not be less than 2");
+                exit(1);
+        }
 
         // Function that creates a shared memory segment and initializes its header
         InitShm(bufSize, itemCnt);        
@@ -77,6 +81,7 @@ int main(int argc, char* argv[])
 	}
 	else if (pid == 0) { /* child process */
 		printf("Launching Consumer \n");
+                //similar to exec() used to execute a file the p stands for path
 		execlp("./consumer","consumer",NULL);
 	}
 	else { /* parent process */
@@ -99,16 +104,24 @@ void InitShm(int bufSize, int itemCnt)
 {
     int in = 0;
     int out = 0;
-    const char *name = "OS_HW1_yourName"; // Name of shared memory object to be passed to shm_open
+    const char *name = "OS_HW1_RubenOrtega"; // Name of shared memory object to be passed to shm_open
 
+     int fd = shm_open(name,O_CREAT | O_RDWR,0666);
      // Write code here to create a shared memory block and map it to gShmPtr  
      // Use the above name.
+     
+     ftruncate(fd,SHM_SIZE);
+
      // **Extremely Important: map the shared memory block for both reading and writing 
      // Use PROT_READ | PROT_WRITE
+     mmap(0, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	
     // Write code here to set the values of the four integers in the header
     // Just call the functions provided below, like this
     SetBufSize(bufSize); 	
+    SetItemCnt(itemCnt);
+    SetIn(in);
+    SetOut(out);
        
 	   
 }
@@ -117,8 +130,23 @@ void Producer(int bufSize, int itemCnt, int randSeed)
 {
     int in = 0;
     int out = 0;
+    int val = 0;
+    int in_index = 0;
         
     srand(randSeed);
+
+    int i=0;
+
+    while(i<itemCnt){
+        if(( (in+1) % bufSize) != GetOut() ) {
+        	val = GetRand(0,3000);
+        	WriteAtBufIndex(in,val);
+        	printf("Producing Item %d with value %d at Index %d\n", i, val, in);
+        	in_index+=strlen(val);
+        	SetIn(in_index);
+        	i++;
+        }
+    }
 
     // Write code here to produce itemCnt integer values in the range [0-3000]
     // Use the functions provided below to get/set the values of shared variables "in" and "out"
@@ -172,7 +200,11 @@ int GetHeaderVal(int i)
 // Set the ith value in the header
 void SetHeaderVal(int i, int val)
 {
-       // Write the implementation
+    // Calculate the memory address corresponding to the ith integer in the header
+    void* ptr = gShmPtr + i * sizeof(int);
+    
+    // Write the specified value to the memory address
+    memcpy(ptr, &val, sizeof(int));
 
 }
 
@@ -212,7 +244,16 @@ void WriteAtBufIndex(int indx, int val)
 // Read the val at the given index in the bounded buffer
 int ReadAtBufIndex(int indx)
 {
-        // Write the implementation
+   int val;
+    
+    // Calculate the memory address corresponding to the specified index in the bounded buffer
+    void* ptr = gShmPtr + 4 * sizeof(int) + indx * sizeof(int);
+    
+    // Read the value stored at the memory address
+    memcpy(&val, ptr, sizeof(int));
+    
+    // Return the value read from the buffer
+    return val;
  
 }
 
