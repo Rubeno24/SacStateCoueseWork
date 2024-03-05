@@ -141,10 +141,18 @@ void Producer(int bufSize, int itemCnt, int randSeed)
     // while loops keep going until i is greater than itemCount
     while(i<itemCnt){
 
+        //we add 1 to in which is the current index and modulous that with the size of the buffer
+        //that makes sure that the index wraps around when it reaches the end of the buffer then we 
+        // make sure that it will not be equal to getOut() which is the index where numbers are being
+        //read from.
+        //simple terms the if statements makes it so the producer doesnt write into the buffer when its
+        //full and it overwrites numbers in the buffer
         if(((in+1) % bufSize) != GetOut() ) {
+                //val variable gets a random number from 0 to 3000
                 val = GetRand(0,3000);
+                //
                 WriteAtBufIndex(in,val);
-                printf("Producing Item %d with value %d at Index %d\n", i+1, val, in);
+                printf("Producing Item %d with value %d at Index %d\n", i, val, in);
                 in = (in + 1) % bufSize;
                 SetIn(in);
                 i++;
