@@ -150,7 +150,7 @@ void Producer(int bufSize, int itemCnt, int randSeed)
         if(((in+1) % bufSize) != GetOut() ) {
                 //val variable gets a random number from 0 to 3000
                 val = GetRand(0,3000);
-                //
+                
                 WriteAtBufIndex(in,val);
                 printf("Producing Item %d with value %d at Index %d\n", i, val, in);
                 in = (in + 1) % bufSize;
