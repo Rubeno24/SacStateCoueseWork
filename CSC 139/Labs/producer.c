@@ -1,9 +1,9 @@
 /*/*
 CSC139 
-Spring 2023
+Spring 2024
 First Assignment
-Last Name, First Name
-Section #
+Ortega, Ruben
+Section #07
 OSs Tested on: such as Linux, Mac, etc.
 */
 
@@ -59,6 +59,9 @@ int main(int argc, char* argv[])
         randSeed = atoi(argv[3]);
         
         // Write code to check the validity of the command-line arguments
+        //checks that buffer size is from the range 2 to 600 using if statements
+        //if not we print an error message and exit the program with the exit status
+        //of 1 which ends the program
         if(bufSize>600){
                 printf("The bounded buffer can not exceed 600");
                 exit(1);
@@ -103,17 +106,12 @@ void InitShm(int bufSize, int itemCnt)
     int out = 0;
     const char *name = "OS_HW1_RubenOrtega"; // Name of shared memory object to be passed to shm_open
 
-     int fd = shm_open(name, O_CREAT | O_RDWR, 0666);
+
      // Write code here to create a shared memory block and map it to gShmPtr  
      // Use the above name.
-
-         // Check to ensure shared memory was created alright.
-    if(fd < 0) {
-        printf("Error: Problem initilizing shared memory object.\n");
-        exit(1);
-    }
-
+     int fd = shm_open(name, O_CREAT | O_RDWR, 0666);
      
+     // configure the size of the shared memory object
      ftruncate(fd,SHM_SIZE);
 
      // **Extremely Important: map the shared memory block for both reading and writing 
@@ -134,16 +132,19 @@ void Producer(int bufSize, int itemCnt, int randSeed)
 {
     int in = 0;
     int out = 0;
+    //initialize a variable that will hold the current number generated
     int val = 0;        
     srand(randSeed);
 
     int i=0;
 
+    // while loops keep going until i is greater than itemCount
     while(i<itemCnt){
+
         if(((in+1) % bufSize) != GetOut() ) {
                 val = GetRand(0,3000);
                 WriteAtBufIndex(in,val);
-                printf("Producing Item %d with value %d at Index %d\n", i, val, in);
+                printf("Producing Item %d with value %d at Index %d\n", i+1, val, in);
                 in = (in + 1) % bufSize;
                 SetIn(in);
                 i++;
