@@ -70,12 +70,18 @@ int main()
      // where i is the item number, val is the item value, out is its index in the bounded buffer
      //in_index+=strlen(val);
      int i = 0;
+     //while loops keeps going untill i is greater than item count
      while(i<itemCnt){
         in=GetIn();
+        //if loops checks if there are items to be consumed
         if(in!=out){
+                //reads the item with the current out index in the buffer and stores it into val
                 int val= ReadAtBufIndex(out);
+                //then prints it
                 printf("Consuming Item %d with value %d at Index %d\n", i, val, out);
+                //increments out by 1 and mods with bufsize to make sure it stays in the bounds of the buffer
                 out=(out+1)%bufSize;
+                //then we set out and increment i to keep the while loop going
                 SetOut(out);
                 i++;
 
@@ -116,6 +122,7 @@ int GetHeaderVal(int i)
 // Set the ith value in the header
 void SetHeaderVal(int i, int val)
 {
+        //commented in producer
         void* ptr = gShmPtr + i*sizeof(int);
         memcpy(ptr, &val, sizeof(int));
 }
@@ -148,6 +155,7 @@ int GetOut()
 void WriteAtBufIndex(int indx, int val)
 {
         // Skip the four-integer header and go to the given index 
+        //explained in the producer
         void* ptr = gShmPtr + 4*sizeof(int) + indx*sizeof(int);
         memcpy(ptr, &val, sizeof(int));
 }
@@ -155,14 +163,10 @@ void WriteAtBufIndex(int indx, int val)
 // Read the val at the given index in the bounded buffer
 int ReadAtBufIndex(int indx)
 {
+    //explained in the producer
     int val;
-    // Calculate the memory address corresponding to the specified index in the bounded buffer
-void* ptr = gShmPtr + 4*sizeof(int) + indx*sizeof(int);
-    
-    // Read the value stored at the memory address
+    void* ptr = gShmPtr + 4*sizeof(int) + indx*sizeof(int);
     memcpy(&val, ptr, sizeof(int));
-    
-    // Return the value read from the buffer
     return val;
 }
 

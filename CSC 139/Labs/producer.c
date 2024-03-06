@@ -112,10 +112,13 @@ void InitShm(int bufSize, int itemCnt)
      int fd = shm_open(name, O_CREAT | O_RDWR, 0666);
      
      // configure the size of the shared memory object
-     ftruncate(fd,SHM_SIZE);
+     //pass in buffer size
+     ftruncate(fd,bufSize);
 
      // **Extremely Important: map the shared memory block for both reading and writing 
      // Use PROT_READ | PROT_WRITE
+     //pass in buffer size
+     //pointer to shared mem block
      gShmPtr=mmap(0, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         
     // Write code here to set the values of the four integers in the header
@@ -151,8 +154,11 @@ void Producer(int bufSize, int itemCnt, int randSeed)
                 //val variable gets a random number from 0 to 3000
                 val = GetRand(0,3000);
                 
+                //write at index in and the value saved in val
                 WriteAtBufIndex(in,val);
+                //print statement 
                 printf("Producing Item %d with value %d at Index %d\n", i, val, in);
+                //after writing to buffer, in is increased by 1 and set using SetIn and increment i by 1
                 in = (in + 1) % bufSize;
                 SetIn(in);
                 i++;
@@ -201,9 +207,12 @@ void SetOut(int val)
 
 // Get the ith value in the header
 int GetHeaderVal(int i)
-{
+{       //val will be used to store number from shared memory
         int val;
+        //i*sizeof(int) calculates the offset in the shared memory block and is added to the
+        //shared memeory block pointer to access that value in memory and that is stored in ptr
         void* ptr = gShmPtr + i*sizeof(int);
+        //memeory copies the data stored in ptr mem location to the val memory location
         memcpy(&val, ptr, sizeof(int));
         return val;
 }
@@ -211,10 +220,10 @@ int GetHeaderVal(int i)
 // Set the ith value in the header
 void SetHeaderVal(int i, int val)
 {
-    // Calculate the memory address corresponding to the ith integer in the header
+    //pointer to shared memory location
     void* ptr = gShmPtr + i*sizeof(int);
     
-    // Write the specified value to the memory address
+    // Now we are copying the value of val to the memory location of ptr
     memcpy(ptr, &val, sizeof(int));
 
 }
@@ -247,7 +256,12 @@ int GetOut()
 void WriteAtBufIndex(int indx, int val)
 {
         // Skip the four-integer header and go to the given index 
+        //pointer named ptr points to shared memory block, we add 4*sizeof(int) to skip the four integer
+        //header values, then we add indx*sizeof(int) to calc the offset in the shared mem block
+        //that esstianly takes us to the value of index in the shared memory
+
         void* ptr = gShmPtr + 4*sizeof(int) + indx*sizeof(int);
+        // then we use memeory copy to what the val pointer is pointing to to the ptr memory locatiaon
         memcpy(ptr, &val, sizeof(int));
 }
 
@@ -255,14 +269,13 @@ void WriteAtBufIndex(int indx, int val)
 int ReadAtBufIndex(int indx)
 {
    int val;
-    
-    // Calculate the memory address corresponding to the specified index in the bounded buffer
+
+    //ptr store the location that we are goint to be accessing 
     void* ptr = gShmPtr + 4*sizeof(int) + indx*sizeof(int);
     
-    // Read the value stored at the memory address
+    // what ever is stored in ptr is pointing to will be copied over to what val is pointing to and returned
     memcpy(&val, ptr, sizeof(int));
     
-    // Return the value read from the buffer
     return val;
  
 }
