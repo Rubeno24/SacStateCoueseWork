@@ -160,7 +160,7 @@ void WriteAtBufIndex(int indx, int val)
         memcpy(ptr, &val, sizeof(int));
 }
 
-// Read the val at the given index in the bounded buffers
+// Read the val at the given index in the bounded buffer
 int ReadAtBufIndex(int indx)
 {
     //explained in the producer
