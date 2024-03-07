@@ -1,10 +1,9 @@
 /*/*
 CSC139 
 Spring 2024
-First Assignment
 Ortega, Ruben
 Section #07
-OSs Tested on: such as Linux, Mac, etc.
+OSs Tested on: Linux and Mac os
 */
 
 #include <stdio.h>

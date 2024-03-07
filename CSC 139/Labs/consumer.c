@@ -1,3 +1,11 @@
+/*/*
+CSC139 
+Spring 2024
+Ortega, Ruben
+Section #07
+OSs Tested on: Linux and Mac os
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
