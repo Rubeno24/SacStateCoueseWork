@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
-#define MAX_TASKS 100 // Maximum number of tasks
+#define MAX_TASKS 100
 
 // Structure to represent a task
 struct Task {
@@ -9,19 +8,14 @@ struct Task {
     int arrival_time;
     int cpu_burst;
     int priority;
+    int time_quantum; // New field for time quantum
 };
-
-// Function prototypes
-void RR_method(struct Task tasks[], int num_tasks);
-void SJF_method(struct Task tasks[], int num_tasks);
-void PR_noPREMP_method(struct Task tasks[], int num_tasks);
-void PR_withPREMP_method(struct Task tasks[], int num_tasks);
 
 int main() {
     FILE *file;
-    char filename[] = "input.txt"; 
-    struct Task tasks[MAX_TASKS]; // Array to store tasks
-    int num_tasks, task_id, arrival_time, cpu_burst, priority;
+    char filename[] = "input.txt";
+    struct Task tasks[MAX_TASKS];
+    int num_tasks, task_id, arrival_time, cpu_burst, priority, time_quantum;
 
     // Open the file for reading
     file = fopen(filename, "r");
@@ -34,6 +28,13 @@ int main() {
     char algorithm_name[20];
     fscanf(file, "%s", algorithm_name);
 
+    // Read the time quantum if the algorithm is RR, else set it to 0
+    if (strcmp(algorithm_name, "RR") == 0) {
+        fscanf(file, "%d", &time_quantum); // Read time quantum
+    } else {
+        time_quantum = 0; // Set time quantum to 0 for other algorithms
+    }
+
     // Read the number of tasks
     fscanf(file, "%d", &num_tasks);
 
@@ -44,53 +45,17 @@ int main() {
         tasks[i].arrival_time = arrival_time;
         tasks[i].cpu_burst = cpu_burst;
         tasks[i].priority = priority;
+        tasks[i].time_quantum = time_quantum; // Set time quantum
     }
 
     // Close the file
     fclose(file);
 
-    // Check the scheduling algorithm name and call the appropriate methods
-    if (strcmp(algorithm_name, "RR") == 0) {
-        // Call RR method
-        RR_method(tasks, num_tasks);
-    } else if (strcmp(algorithm_name, "SJF") == 0) {
-        // Call SJF method
-        SJF_method(tasks, num_tasks);
-    } else if (strcmp(algorithm_name, "PR_noPREMP") == 0) {
-        // Call PR_noPREMP method
-        PR_noPREMP_method(tasks, num_tasks);
-    } else if (strcmp(algorithm_name, "PR_withPREMP") == 0) {
-        // Call PR_withPREMP method
-        PR_withPREMP_method(tasks, num_tasks);
-    } else {
-        printf("Unsupported scheduling algorithm: %s\n", algorithm_name);
-    }
-
-        printf("Task ID\t Arrival Time\t CPU Burst\t Priority\n");
+    // Print the tasks stored in the array
+    printf("Task ID\t Arrival Time\t CPU Burst\t Priority\t Time Quantum\n");
     for (int i = 0; i < num_tasks; i++) {
-        printf("%d\t %d\t\t %d\t\t %d\n", tasks[i].task_id, tasks[i].arrival_time, tasks[i].cpu_burst, tasks[i].priority);
+        printf("%d\t %d\t\t %d\t\t %d\t\t %d\n", tasks[i].task_id, tasks[i].arrival_time, tasks[i].cpu_burst, tasks[i].priority, tasks[i].time_quantum);
     }
 
     return 0;
-}
-
-// Define method implementations
-void RR_method(struct Task tasks[], int num_tasks) {
-    // Method implementation for Round Robin
-    printf("Round Robin method called\n");
-}
-
-void SJF_method(struct Task tasks[], int num_tasks) {
-    // Method implementation for Shortest Job First
-    printf("Shortest Job First method called\n");
-}
-
-void PR_noPREMP_method(struct Task tasks[], int num_tasks) {
-    // Method implementation for Priority Scheduling without Preemption
-    printf("Priority Scheduling without Preemption method called\n");
-}
-
-void PR_withPREMP_method(struct Task tasks[], int num_tasks) {
-    // Method implementation for Priority Scheduling with Preemption
-    printf("Priority Scheduling with Preemption method called\n");
 }
