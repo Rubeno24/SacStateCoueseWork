@@ -149,7 +149,7 @@ void Producer(int bufSize, int itemCnt, int randSeed)
         //read from.
         //simple terms the if statements makes it so the producer doesnt write into the buffer when its
         //full and it overwrites numbers in the buffer
-        if(((in+1) % bufSize) != GetOut() ) {
+        if(((in+1) % bufSize) != GetOut()) {
                 //val variable gets a random number from 0 to 3000
                 val = GetRand(0,3000);
                 
